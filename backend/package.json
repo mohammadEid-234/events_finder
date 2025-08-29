@@ -1,0 +1,28 @@
+{
+  "name": "events_and_services_finder",
+  "version": "1.0.0",
+  "description": "",
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon src/server.ts"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "joi": "^18.0.1",
+    "jsonwebtoken": "^9.0.2",
+    "libphonenumber-js": "^1.12.13",
+    "mongoose": "^8.17.2"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/jsonwebtoken": "^9.0.10",
+    "nodemon": "^3.1.10",
+    "typescript": "^5.9.2"
+  }
+}
