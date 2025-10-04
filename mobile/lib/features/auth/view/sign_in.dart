@@ -21,15 +21,17 @@ class SignInView extends StatelessWidget {
       body: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child:
-                Column(
-                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+            Center(child: SingleChildScrollView(
+
+              child:      Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   Container(
                     margin: EdgeInsets.only(bottom: 5),
                     child:CircleBadge(color:mainColor,
-                    height: 85,
-                    width: 85,
-                    child: const Icon(Icons.lock_outline,size: 50,color: Colors.white,),),
+                      height: 85,
+                      width: 85,
+                      child: const Icon(Icons.lock_outline,size: 50,color: Colors.white,),),
                   ),
                   Text('Sign In',style: TextStyle(fontSize: 18,),),
 
@@ -37,10 +39,13 @@ class SignInView extends StatelessWidget {
                   Container(
                     decoration: BoxDecoration(
                         color: Colors.white,
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 5),
-                    child: ListView(
-                       shrinkWrap: true,
+                        borderRadius: BorderRadius.all(Radius.circular(15))),
+                    padding: EdgeInsets.symmetric(horizontal: 15,vertical: 15),
+                    //height: screenHeight * 0.6,
+                    child: Column(
+                      //shrinkWrap: true,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
 
                         const FieldLabel('Email or Phone number'),
@@ -102,6 +107,7 @@ class SignInView extends StatelessWidget {
                         Consumer<SignInVM>(
                           builder: (context, vm, _) => SizedBox(
                             height: 48,
+                            width: double.infinity,
                             child: FilledButton(
                               onPressed: vm.loading ? null : vm.submit,
                               style: FilledButton.styleFrom(
@@ -145,7 +151,7 @@ class SignInView extends StatelessWidget {
                                 child: SocialButton(
                                   label: 'Google',
                                   onPressed: vm.loading ? null : vm.signInWithGoogle,
-                                  leading: Image.asset("assets/images/google_logo.png",height: 25,width: 25,),
+                                  leading: Image.asset("assets/images/google_logo.png",height: 45,width: 45,),
                                 ),
                               ),
                               const SizedBox(width: 16),
@@ -153,7 +159,7 @@ class SignInView extends StatelessWidget {
                                 child: SocialButton(
                                   label: 'Facebook',
                                   onPressed: vm.loading ? null : vm.signInWithFacebook,
-                                  leading: Image.asset("assets/images/fb_logo.png",height: 25,width: 25,),
+                                  leading: Image.asset("assets/images/fb_logo.png",height: 45,width: 45,),
                                 ),
                               ),
                             ],
@@ -165,25 +171,27 @@ class SignInView extends StatelessWidget {
                     ),),
                   SizedBox(height: 15,),
                   Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text("Don't have an account? "),
-                        GestureDetector(
-                          onTap: () {
-                            // TODO: Navigate to SignUp screen
-                            Navigator.of(context).push(MaterialPageRoute(builder: (context)=> Signup()));
-                          },
-                          child: const Text(
-                            "Sign Up",
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: mainColor, // same primary blue
-                            ),
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text("Don't have an account? "),
+                      GestureDetector(
+                        onTap: () {
+                          // TODO: Navigate to SignUp screen
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context)=> SignUp()));
+                        },
+                        child: const Text(
+                          "Sign Up",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: mainColor, // same primary blue
                           ),
                         ),
-                      ],
-                    ),
-                ],)
+                      ),
+                    ],
+                  ),
+                ],),),)
+
+
 
 
 

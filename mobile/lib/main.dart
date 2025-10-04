@@ -16,7 +16,11 @@ class App extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorSchemeSeed: mainColor, // primary blue
+        colorSchemeSeed: mainColor, 
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          scrolledUnderElevation: 0,),// primary blue
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
           fillColor: fillColor,

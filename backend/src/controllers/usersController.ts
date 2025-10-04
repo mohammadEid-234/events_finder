@@ -16,7 +16,7 @@ export const createUser: RequestHandler = async (req, res, next) => {
             email: Joi.string().email(),
             //require at least 1 lowercase, 1 uppercase, 1 number, 1 special char, 8–20 length
             password: Joi.string().required().pattern(new RegExp(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/)),
-            repeat_password: Joi.ref('password'),
+            confirm_password: Joi.ref('password'),
         })
             //one of phone_number and email is required but not together 
             .xor("phone_number", "email")
@@ -44,15 +44,15 @@ export const createUser: RequestHandler = async (req, res, next) => {
             password: passwordHashed
         })
 
-        //store the refresh token in the website cookie
-        res.cookie("refreshToken", signRefreshToken({"id": user.id}), {
+        //store the refresh token in the cookies
+        res.cookie("refresh_token", signRefreshToken({"id": user.id}), {
             httpOnly: true,        // not accessible via JS
             secure: true,          // only sent over HTTPS
             sameSite: "strict",    // CSRF protection
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
         return res.status(201).send({
-           "accessToken": signAccessToken({"id": user.id}),
+           "access_token": signAccessToken({"id": user.id}),
             "message": "success"
         })
     } catch (e) {

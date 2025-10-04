@@ -35,6 +35,11 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   provider: ^6.1.5+1
+  phone_numbers_parser: ^9.0.11
+  http: ^1.5.0
+  dio: ^5.9.0
+  flutter_secure_storage: ^9.2.4
+  dart_jsonwebtoken: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -61,6 +66,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
      - assets/images/
+     - assets/data/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

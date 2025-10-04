@@ -1,3 +1,4 @@
+import 'package:finder/core/validation/user_input_validation.dart';
 import 'package:flutter/material.dart';
 
 class PasswordFieldWithValidation extends StatefulWidget {
@@ -12,11 +13,6 @@ class PasswordFieldWithValidation extends StatefulWidget {
 class _PasswordFieldWithValidationState extends State<PasswordFieldWithValidation> {
 
 
-  bool get hasLower => RegExp(r'[a-z]').hasMatch(widget.password);
-  bool get hasUpper => RegExp(r'[A-Z]').hasMatch(widget.password);
-  bool get hasDigit => RegExp(r'\d').hasMatch(widget.password);
-  bool get hasSpecial => RegExp(r'[!@#\$%^&*(),.?":{}|<>]').hasMatch(widget.password);
-  bool get validLength => widget.password.length >= 8 && widget.password.length <= 20;
 
   @override
   void dispose() {
@@ -31,11 +27,11 @@ class _PasswordFieldWithValidationState extends State<PasswordFieldWithValidatio
         widget.field,
         const SizedBox(height: 12),
         if(widget.password.isNotEmpty)...[
-          _buildRule("At least 1 lowercase letter", hasLower),
-          _buildRule("At least 1 uppercase letter", hasUpper),
-          _buildRule("At least 1 number", hasDigit),
-          _buildRule("At least 1 special character", hasSpecial),
-          _buildRule("Length 8–20 characters", validLength),
+          _buildRule("At least 1 lowercase letter", hasLower(widget.password)),
+          _buildRule("At least 1 uppercase letter", hasUpper(widget.password)),
+          _buildRule("At least 1 number", hasDigit(widget.password)),
+          _buildRule("At least 1 special character", hasSpecial(widget.password)),
+          _buildRule("Length 8–20 characters", validLength(widget.password)),
         ]
 
       ],

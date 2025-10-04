@@ -18,15 +18,24 @@ class Title extends StatelessWidget {
 
 class FieldLabel extends StatelessWidget {
   final String text;
-  const FieldLabel(this.text, {super.key});
+  final bool isRequired;
+  const FieldLabel(this.text,{super.key,this.isRequired=false});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(text,
+        child: RichText(
+          text: TextSpan(
+              style: const TextStyle(fontWeight: FontWeight.w600,color: Colors.black87),
+              text: text,
+              children: [
+                if(isRequired) ...[
+                  WidgetSpan(child: SizedBox(width: 5,)),
+                  TextSpan(text: "*",style: TextStyle(color: Colors.red))
+                ]
+              ]),)
 
-          style: const TextStyle(fontWeight: FontWeight.w600)),
     );
   }
 }
@@ -67,25 +76,26 @@ class SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final border = RoundedRectangleBorder(borderRadius: BorderRadius.circular(12));
-    return SizedBox(
-      height: 52,
-      child: OutlinedButton(
+    return OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
           shape: border,
           side: const BorderSide(color: Color(0xFFE2E6EA)),
           backgroundColor: Colors.white,
         ),
-        child: Row(
+        child:
+        Container(
+          padding: EdgeInsets.symmetric(vertical: 10),
+          child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             leading,
             const SizedBox(width: 12),
             Text(label, style: const TextStyle(fontWeight: FontWeight.w600,color: Colors.black87)),
           ],
-        ),
-      ),
-    );
+        ) ,)
+       ,
+      );
   }
 }
 
