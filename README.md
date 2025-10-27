@@ -34,10 +34,10 @@ This project is still under active development and not yet ready for production 
 
 ## 🧠 Features (Planned / Implemented)
 
-- ✅ User registration and login (email or phone)
-- ✅ JWT authentication and refresh token system
-- ✅ Event and service listing with filters
-- ✅ Booking system for users
+- ⏳ User registration and login (email or phone)
+- ⏳ JWT authentication and refresh token system
+- ⏳ Event and service listing with filters
+- ⏳ Booking system for users
 - ⏳ Push notifications for updates and reminders
 - ⏳ Admin dashboard for event and service management
 - ⏳ Payments integration (Stripe / PayPal)
