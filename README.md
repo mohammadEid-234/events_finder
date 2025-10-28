@@ -32,7 +32,7 @@ This project is still under active development and not yet ready for production 
 
 ---
 
-## 🧠 Features (Planned / Implemented)
+## 🧠 Features (Planned)
 
 - ⏳ User registration and login (email or phone)
 - ⏳ JWT authentication and refresh token system
