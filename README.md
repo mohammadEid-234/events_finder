@@ -44,8 +44,3 @@ This project is still under active development and not yet ready for production 
 - ⏳ Reviews and ratings
 - ⏳ Search and advanced filtering
 
----
-
-## 🗂️ Project Structure
-
-### Flutter (Frontend)
