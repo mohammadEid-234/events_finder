@@ -1,9 +1,7 @@
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:dio/dio.dart';
+import 'package:finder/core/connection/token.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-typedef TokenPair = ({String accessToken, String refreshToken});
 
 class RevokeTokenException extends DioException {
   RevokeTokenException({required super.requestOptions});
@@ -13,7 +11,6 @@ class AuthInterceptor extends QueuedInterceptor {
   /// Create an Auth interceptor
   AuthInterceptor({
     required this.dio,
-    required this.secureStorage,
     this.shouldClearBeforeReset = true,
   }) {
     refreshClient = Dio();
@@ -24,40 +21,14 @@ class AuthInterceptor extends QueuedInterceptor {
   }
 
   final Dio dio;
-  final FlutterSecureStorage secureStorage;
   final bool shouldClearBeforeReset;
   late final Dio refreshClient;
   late final Dio retryClient;
+  final TokenManager tokenManager = TokenManager.instance;
 
-  Future<String?> get _accessToken => secureStorage.read(key: 'accessToken');
-
-  Future<String?> get _refreshToken => secureStorage.read(key: 'refreshToken');
-
-  Future<TokenPair?> _getTokenPair() async {
-    final accessToken = await _accessToken;
-    final refreshToken = await _refreshToken;
-
-    if (accessToken != null && refreshToken != null) {
-      return (accessToken: accessToken, refreshToken: refreshToken);
-    }
-    return null;
-  }
-
-  Future<void> _saveTokenPair(TokenPair tokenPair) async {
-    await secureStorage.write(key: 'accessToken', value: tokenPair.accessToken);
-    await secureStorage.write(
-      key: 'refreshToken',
-      value: tokenPair.refreshToken,
-    );
-  }
-
-  Future<void> _clearTokenPair() async {
-    await secureStorage.delete(key: 'accessToken');
-    await secureStorage.delete(key: 'refreshToken');
-  }
 
   Future<Map<String, dynamic>> _buildHeaders() async {
-    final tokenPair = await _getTokenPair();
+    final tokenPair = await tokenManager.getTokenPair();
 
     return {'Authorization': 'Bearer ${tokenPair!.accessToken}'};
   }
@@ -67,41 +38,20 @@ class AuthInterceptor extends QueuedInterceptor {
   @pragma('vm:prefer-inline')
   bool shouldRefresh<R>(Response<R>? response) => response?.statusCode == 401;
 
-  Future<bool> get _isAccessTokenValid async {
-    final tokenPair = await _getTokenPair();
 
-    if (tokenPair == null) {
-      return false;
-    }
-
-    final decodedJwt = JWT.decode(tokenPair.accessToken);
-    final expirationTimeEpoch = decodedJwt.payload['exp'];
-    final expirationDateTime = DateTime.fromMillisecondsSinceEpoch(
-      expirationTimeEpoch * 1000,
-    );
-
-    final marginOfErrorInMilliseconds = 1000; // appr 1 seconds
-    final addedMarginTime = Duration(milliseconds: marginOfErrorInMilliseconds);
-
-    return DateTime.now().add(addedMarginTime).isBefore(expirationDateTime);
-  }
-
-  Future<TokenPair?> _refresh({
-    required RequestOptions options,
-    TokenPair? tokenPair,
-  }) async {
+  Future<TokenPair?> _refresh({required RequestOptions options, TokenPair? tokenPair,}) async {
     if (tokenPair == null) {
       throw RevokeTokenException(requestOptions: options);
     }
 
     try {
       refreshClient.options = refreshClient.options.copyWith(
-        headers: {'refresh-Token': tokenPair.refreshToken},
+        headers: {'refresh-token': tokenPair.refreshToken},
       );
 
       /// it will be changed based on your project
-      final response = await refreshClient.post(
-        '/endpoint-to-send-refresh-request',
+      final response = await refreshClient.get(
+        '/auth/refresh-token',
       );
 
       final TokenPair newTokenPair = (
@@ -110,13 +60,13 @@ class AuthInterceptor extends QueuedInterceptor {
       );
 
       if (shouldClearBeforeReset) {
-        await _clearTokenPair();
+        await tokenManager.clearTokenPair();
       }
 
-      await _saveTokenPair(newTokenPair);
+      await tokenManager.saveTokenPair(newTokenPair);
       return newTokenPair;
     } catch (_) {
-      await _clearTokenPair();
+      await tokenManager.clearTokenPair();
       throw RevokeTokenException(requestOptions: options);
     }
   }
@@ -155,40 +105,40 @@ class AuthInterceptor extends QueuedInterceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    try {
-      final tokenPair = await _getTokenPair();
+      try {
+        final tokenPair = await tokenManager.getTokenPair();
 
-      if (tokenPair == null) {
-        return handler.next(options);
-      }
-
-      final isAccessTokenValid = await _isAccessTokenValid;
-
-      if (isAccessTokenValid) {
-        options.headers.addAll(await _buildHeaders());
-        return handler.next(options);
-      } else {
-        final newTokenPair = await _refresh(
-          options: options,
-          tokenPair: tokenPair,
-        );
-
-        if (newTokenPair == null) {
-          return handler.reject(
-            RevokeTokenException(requestOptions: options),
-            true,
-          );
+        if (tokenPair == null) {
+          return handler.next(options);
         }
 
-        options.headers.addAll(await _buildHeaders());
-        return handler.next(options);
+        final isAccessTokenValid = await tokenManager.isAccessTokenValid;
+
+        if (isAccessTokenValid) {
+          options.headers.addAll(await _buildHeaders());
+          return handler.next(options);
+        } else {
+          final newTokenPair = await _refresh(
+            options: options,
+            tokenPair: tokenPair,
+          );
+
+          if (newTokenPair == null) {
+            return handler.reject(
+              RevokeTokenException(requestOptions: options),
+              true,
+            );
+          }
+
+          options.headers.addAll(await _buildHeaders());
+          return handler.next(options);
+        }
+      } catch (_) {
+        return handler.reject(
+          RevokeTokenException(requestOptions: options),
+          true,
+        );
       }
-    } catch (_) {
-      return handler.reject(
-        RevokeTokenException(requestOptions: options),
-        true,
-      );
-    }
   }
 
   @override
@@ -205,8 +155,8 @@ class AuthInterceptor extends QueuedInterceptor {
       return handler.next(err);
     }
 
-    final isAccessValid = await _isAccessTokenValid;
-    final tokenPair = await _getTokenPair();
+    final isAccessValid = await tokenManager.isAccessTokenValid;
+    final tokenPair = await tokenManager.getTokenPair();
 
     if (tokenPair == null) {
       return handler.reject(err);

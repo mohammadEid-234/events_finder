@@ -5,6 +5,7 @@ import 'package:finder/features/auth/model/country_code.dart';
 import 'package:finder/features/auth/view/common.dart';
 import 'package:finder/features/auth/view/password_validator.dart';
 import 'package:finder/features/auth/view/sign_in.dart';
+import 'package:finder/features/auth/view/signup_success.dart';
 import 'package:finder/features/auth/view_model/sign_up_vm.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -269,6 +270,10 @@ class SignUp extends StatelessWidget {
                                   backgroundColor: mainColor
                               ),
                               onPressed: vm.submittingForm? null : () {
+                                Navigator.of(context).push( MaterialPageRoute(builder: (context){
+                                  return ReadyProfileScreen();
+                                }));
+                                return;
                                 if(formKey.currentState?.validate() != true){
                                   return;
                                 }

@@ -1,9 +1,11 @@
 import 'package:dio/dio.dart';
-import 'package:finder/core/connection/connection.dart';
 import 'package:finder/core/connection/dio.dart';
+import 'package:finder/core/connection/token.dart';
 import 'package:finder/core/logging/logger.dart';
 
+
 class AuthRepository {
+  TokenManager tokenManager = TokenManager.instance;
   Future<void> signIn({required String email, required String password}) async {
     await Future.delayed(const Duration(milliseconds: 900));
     if (email.isEmpty || password.isEmpty) {
@@ -17,25 +19,31 @@ class AuthRepository {
     String? email,
     String? phone,
     required String password,
-    required String confirmPassword,
-
   }) async {
     try{
       assert(email!=null || phone!=null );
-      final res = await dio.post("/users",data: {
+      final res = await dio.post("/users",data:
+      {
         "full_name":fullName,
-        if(phone!=null)
+        if(phone!=null && phone.isNotEmpty)
           "phone_number":phone,
-        if(email!=null)
+        if(email!=null && email.isNotEmpty)
           "email":email,
         "password":password,
-        "confirm_password":confirmPassword
-      });
-
+      }
+     );
+      Logger.log("response body : ${res.data}");
+      Logger.log("response headers : ${res.headers}");
+      if(res.statusCode == 200){
+        final accessToken =  res.data["access_token"] as String;
+        final refreshToken = res.headers.map["refresh_token"] as String;
+        tokenManager.saveTokenPair(
+            (accessToken: accessToken, refreshToken: refreshToken));
+      }
       return res;
 
     } catch(e){
-      Logger.log("");
+      Logger.log("signUp error :$e ");
       return null;
     }
 

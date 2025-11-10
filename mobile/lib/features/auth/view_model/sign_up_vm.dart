@@ -5,6 +5,7 @@ import 'package:finder/features/auth/model/auth_repo.dart';
 import 'package:finder/features/auth/model/country_code.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 enum SignUpMethod{
   email,phone
 }
@@ -48,11 +49,16 @@ class SignUpVM extends ChangeNotifier{
     notifyListeners();
   }
   void submitForm()async{
-    setSubmitting(true);
-    await authRepository.signUp(fullName: fullName, password: password, confirmPassword: confirmPassword,
-          phone: phoneNumber,email: email
-          );
-    setSubmitting(false);
+    try{
+      setSubmitting(true);
+      await authRepository.signUp(fullName: fullName, password: password,
+          phone: PhoneNumber.parse(phoneNumber,callerCountry: selectedCountryCode.iso2).international,email: email
+      );
+      setSubmitting(false);
+    }catch(e){
+      debugPrint("Error submitting form: $e");
+    }
+
 
   }
   void onEmailChanged(String value){

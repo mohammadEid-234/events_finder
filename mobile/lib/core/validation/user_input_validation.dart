@@ -23,6 +23,7 @@ String? validatePhoneByCountry(String? input, CountryCode country) {
     if(hasSpecial(input)){
       return 'Phone must contain digits only';
     }
+
     return PhoneNumber.parse(input,callerCountry: country.iso2).isValid(type: PhoneNumberType.mobile) ? null : "Invalid Phone number";
   }catch(e){
     Logger.log("error validating phone :$e");
