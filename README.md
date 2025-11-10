@@ -34,8 +34,8 @@ This project is still under active development and not yet ready for production 
 
 ## 🧠 Features (Planned)
 
-- ⏳ User registration and login (email or phone)
-- ⏳ JWT authentication and refresh token system
+- ✅ User registration and login (email or phone)
+- ✅ JWT authentication and refresh token system
 - ⏳ Event and service listing with filters
 - ⏳ Booking system for users
 - ⏳ Push notifications for updates and reminders
