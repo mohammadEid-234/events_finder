@@ -4,7 +4,7 @@ import express from "express";
 import eventsRouter from "./routers/events.ts";
 import usersRouter from "./routers/users.ts";
 import authRouter from "./routers/auth.ts";
-
+import imagesRouter from "./routers/images.ts"
 import mongoose from "mongoose";
 
 const app = express();
@@ -14,6 +14,8 @@ app.use(express.json())
 app.use("/auth",authRouter)
 app.use("/users",usersRouter)
 app.use("/events", eventsRouter);
+app.use("/images",imagesRouter)
+
 const launchApp = async () => {
     try {
 
