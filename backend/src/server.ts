@@ -6,11 +6,11 @@ import usersRouter from "./routers/users.ts";
 import authRouter from "./routers/auth.ts";
 import imagesRouter from "./routers/images.ts"
 import mongoose from "mongoose";
-
+import cookie from "cookie-parser"
 const app = express();
 
 app.use(express.json())
-
+app.use(cookie())
 app.use("/auth",authRouter)
 app.use("/users",usersRouter)
 app.use("/events", eventsRouter);

@@ -1,4 +1,4 @@
-import type { RequestHandler } from "express";
+import type { CookieOptions, RequestHandler } from "express";
 import Joi from "joi";
 import { parsePhoneNumberWithError } from "libphonenumber-js";
 import User from "../models/User.ts";
@@ -51,16 +51,25 @@ export const createUser: RequestHandler = async (req, res,next) => {
             fullName: params.full_name,
             password: passwordHashed
         })
-
-        //store the refresh token in the cookies
-        res.cookie("refresh_token", signRefreshToken({ "user_id": user.id }), {
+        const refreshToken = signRefreshToken({ "user_id": user.id })
+        const accessToken = signAccessToken({"user_id":user.id})
+        const cookieOptions:CookieOptions = {
             httpOnly: true,        // not accessible via JS
             secure: true,          // only sent over HTTPS
             sameSite: "strict",    // CSRF protection
+        }
+        //store the refresh and access tokens in the cookies for browsers , to not let the client store them in local storage for security reasons
+        res.cookie("refresh_token", refreshToken, {
+            ...cookieOptions,
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
+        res.cookie("access_token", refreshToken, {
+            ...cookieOptions,
+            maxAge: 15 * 60 * 1000, // 15 minutes
+        });
         return res.status(201).send({
-            "access_token": signAccessToken({ "user_id": user.id }),
+            "access_token": accessToken,
+            "refresh_token": refreshToken,
             "message": "success"
         })
     } catch (e) {
