@@ -1,6 +1,6 @@
 import { Router } from "express";
 import type {RequestHandler} from "express";
-import { createEvent } from "../controllers/eventsController.ts";
+import { createEvent } from "../controllers/events.ts";
 
 const middleware :RequestHandler = async(req,res,next)=>{
 
