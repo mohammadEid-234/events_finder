@@ -1,0 +1,7 @@
+PORT=3000
+MONGO_URL=mongodb://localhost:27017/events_finder_db
+IMAGES_PATH=C:/dev/uploads/events_finder
+JWT_ACCESS_TTL=15m         
+JWT_REFRESH_TTL=7d           
+JWT_ALG=HS256
+JWT_SECRET=a5981005bd060563865f4f5aba466f613d459b56e108c5c7780b169b42fc316f

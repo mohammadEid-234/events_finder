@@ -5,6 +5,8 @@ import { verifyToken } from "../lib/jwt.ts";
 import User from "../models/User.ts";
 import { uploadImg } from "../controllers/images.ts";
 import { verifyUser } from "../controllers/auth.ts";
+import "dotenv/config"; // auto-loads .env
+
 const storage = multer.diskStorage({
     filename: (req, file, cb) => {
         //avoid duplicate file names
@@ -12,7 +14,7 @@ const storage = multer.diskStorage({
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
         cb(null, `img-${uniqueSuffix}.png`)
     },
-    destination: "public/uploads/photos"
+    destination: process.env.IMAGES_PATH || "public/uploads/photos"
 })
 const uploads = multer({ storage: storage })
 
@@ -20,5 +22,5 @@ const router = Router()
 
 
 
-router.post("/upload", verifyUser, uploads.single("uploaded_image"),uploadImg)
+router.post("/profile", verifyUser, uploads.single("uploaded_image"),uploadImg)
 export default router

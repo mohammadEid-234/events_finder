@@ -8,9 +8,10 @@ import imagesRouter from "./routers/images.ts"
 import mongoose from "mongoose";
 import cookie from "cookie-parser"
 const app = express();
-
+console.log(".env Images path:",process.env.IMAGES_PATH)
 app.use(express.json())
 app.use(cookie())
+app.use("/uploads",express.static(process.env.IMAGES_PATH || "public/uploads/photos"))
 app.use("/auth",authRouter)
 app.use("/users",usersRouter)
 app.use("/events", eventsRouter);

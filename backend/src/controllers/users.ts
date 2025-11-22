@@ -132,7 +132,10 @@ export const signIn: RequestHandler = async (req, res, next) => {
 }
 export const signOut: RequestHandler = async (req, res, next) => {
     try {
-      
+        res.clearCookie("access_token",accessTokenOptions)
+        res.clearCookie("refresh_token",refreshTokenOptions)
+
+        return res.status(200).send({"message":"Signed out successfully"})
     } catch (e) {
         console.error("createUser error:", e)
         return res.status(500).json({ "message": "Internal Server Error" })

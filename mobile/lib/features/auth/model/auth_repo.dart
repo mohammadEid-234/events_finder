@@ -14,6 +14,21 @@ class AuthRepository {
     // TODO: real auth call
   }
 
+  Future<Response?> uploadImg({required String filePath})async{
+    final res = await dio.post("/users/uploads",data: FormData.fromMap({
+      "file": MultipartFile.fromFile("")
+    })
+    );
+    Logger.log("response body : ${res.data}");
+    Logger.log("response headers : ${res.headers}");
+    if(res.statusCode == 200){
+      final accessToken =  res.data["access_token"] as String;
+      final refreshToken = res.headers.map["refresh_token"] as String;
+      tokenManager.saveTokenPair(
+          (accessToken: accessToken, refreshToken: refreshToken));
+    }
+    return res;
+  }
   Future<Response?> signUp({
     required String fullName,
     String? email,
@@ -22,7 +37,7 @@ class AuthRepository {
   }) async {
     try{
       assert(email!=null || phone!=null );
-      final res = await dio.post("/users",data:
+      final res = await dio.post("/users/sign-up",data:
       {
         "full_name":fullName,
         if(phone!=null && phone.isNotEmpty)

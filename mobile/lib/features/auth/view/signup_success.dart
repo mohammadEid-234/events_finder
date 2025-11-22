@@ -1,3 +1,4 @@
+import 'package:finder/main.dart';
 import 'package:flutter/material.dart';
 
 class ReadyProfileScreen extends StatelessWidget {
@@ -11,24 +12,17 @@ class ReadyProfileScreen extends StatelessWidget {
     const accent = Color(0xFF22C55E);      // green check
     final textTheme = Theme.of(context).textTheme;
 
-    return Scaffold(
-      backgroundColor: bg,
-      body: Center(
-          child: Container(
+    return
+      PopScope(
+          canPop: false,
+          child:Scaffold(
+        //appBar: AppBar(),
+        body: Center(
+          child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 32),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(cardRadius),
-              boxShadow: const [
-                BoxShadow(
-                  color: Color(0x14000000),
-                  blurRadius: 18,
-                  offset: Offset(0, 10),
-                )
-              ],
-            ),
             child: Column(
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.max,
               children: [
                 // Green check icon
                 Container(
@@ -99,35 +93,6 @@ class ReadyProfileScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 12),
 
-                // Continue (filled dark)
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: dark,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Continue tapped')),
-                      );
-                    },
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
-                        Text('Continue'),
-                        SizedBox(width: 8),
-                        Icon(Icons.arrow_right_alt_rounded),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
 
                 // Skip for now (text button)
                 TextButton(
@@ -145,7 +110,8 @@ class ReadyProfileScreen extends StatelessWidget {
             ),
           ),
 
-      ),
-    );
+        ),
+      ) )
+      ;
   }
 }

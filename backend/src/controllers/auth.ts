@@ -23,7 +23,7 @@ export const verifyUser: RequestHandler = (req, res, next) => {
         next()
     } catch (e) {
         console.error("error verifying token:", e)
-        return res.status(401).send("Expired or Invalid token");
+        return res.status(401).send({"message":"Expired or Invalid token"});
     }
 
 }
