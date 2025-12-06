@@ -43,20 +43,34 @@ class SignUpVM extends ChangeNotifier{
 
   }
 
-  bool submittingForm=false;
+  bool submittingForm=false,signUpSuccess=false;
+  void setSignUpSuccess(bool value){
+    signUpSuccess=value;
+    notifyListeners();
+  }
   void setSubmitting(bool value){
     submittingForm=value;
     notifyListeners();
   }
-  void submitForm()async{
+  Future<void> submitForm()async{
     try{
       setSubmitting(true);
-      await authRepository.signUp(fullName: fullName, password: password,
-          phone: PhoneNumber.parse(phoneNumber,callerCountry: selectedCountryCode.iso2).international,email: email
+      String? fullPhoneNumber;
+      if(phoneNumber.isNotEmpty){
+        fullPhoneNumber = PhoneNumber.parse(phoneNumber,callerCountry: selectedCountryCode.iso2).international;
+      }
+       await authRepository.signUp(fullName: fullName, password: password,
+          phone: fullPhoneNumber,email: email
       );
+       //if no exception is thrown consider it success
+      setSignUpSuccess(true);
       setSubmitting(false);
+
+
     }catch(e){
       debugPrint("Error submitting form: $e");
+      setSignUpSuccess(false);
+      setSubmitting(false);
     }
 
 
@@ -70,6 +84,7 @@ class SignUpVM extends ChangeNotifier{
     selectedCountryCode=value;
     notifyListeners();
   }
+
   void onCountryCodeChanged(CountryCode? value){
     if(value == null) return;
     setSelectedCountryCode(value);

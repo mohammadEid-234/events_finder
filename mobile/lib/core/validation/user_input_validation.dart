@@ -1,5 +1,6 @@
 import 'package:finder/core/logging/logger.dart';
 import 'package:finder/features/auth/model/country_code.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 bool isValidEmail(String email) {
@@ -14,8 +15,9 @@ bool isValidEmail(String email) {
   return regex.hasMatch(email);
 }
 
-String? validatePhoneByCountry(String? input, CountryCode country) {
+String? validatePhoneByCountry(String? input, {CountryCode? country}) {
   try{
+    // return null if valid else error string
 
     if (input == null || input.trim().isEmpty) {
       return 'Phone is required';
@@ -23,8 +25,7 @@ String? validatePhoneByCountry(String? input, CountryCode country) {
     if(hasSpecial(input)){
       return 'Phone must contain digits only';
     }
-
-    return PhoneNumber.parse(input,callerCountry: country.iso2).isValid(type: PhoneNumberType.mobile) ? null : "Invalid Phone number";
+    return PhoneNumber.parse(input,callerCountry: country?.iso2).isValid(type: PhoneNumberType.mobile) ? null : "Invalid Phone number";
   }catch(e){
     Logger.log("error validating phone :$e");
     return "Error validating phone";

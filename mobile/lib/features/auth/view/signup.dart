@@ -1,10 +1,8 @@
-import 'package:finder/core/logging/logger.dart';
 import 'package:finder/core/style.dart';
 import 'package:finder/core/validation/user_input_validation.dart';
 import 'package:finder/features/auth/model/country_code.dart';
 import 'package:finder/features/auth/view/common.dart';
 import 'package:finder/features/auth/view/password_validator.dart';
-import 'package:finder/features/auth/view/sign_in.dart';
 import 'package:finder/features/auth/view/signup_success.dart';
 import 'package:finder/features/auth/view_model/sign_up_vm.dart';
 import 'package:flutter/material.dart';
@@ -184,7 +182,7 @@ class SignUp extends StatelessWidget {
                                           if (isEmpty(value)) {
                                             return "Phone is required";
                                           }
-                                          return validatePhoneByCountry(value, countryCode);
+                                          return validatePhoneByCountry(value, country: countryCode);
 
                                         },
                                         onChanged: context
@@ -269,15 +267,20 @@ class SignUp extends StatelessWidget {
                               style: FilledButton.styleFrom(
                                   backgroundColor: mainColor
                               ),
-                              onPressed: vm.submittingForm? null : () {
-                                Navigator.of(context).push( MaterialPageRoute(builder: (context){
-                                  return ReadyProfileScreen();
-                                }));
-                                return;
+                              onPressed: vm.submittingForm? null : () async{
+                              
                                 if(formKey.currentState?.validate() != true){
                                   return;
                                 }
-                                vm.submitForm();
+                               await vm.submitForm();
+                               if(vm.signUpSuccess){
+                                Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context){
+                                  return const ReadyProfileScreen();
+                                }));
+                               }else{
+                                 //
+                                showErrorDialog(context, "Sign up failed. Please try again.");
+                               }
                               }, child: Text(vm.submittingForm?  "Signing Up":"Sign Up"));
                         })
                      ),

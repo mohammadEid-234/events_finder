@@ -21,13 +21,12 @@ const launchApp = async () => {
     try {
 
         await mongoose.connect(process.env.MONGO_URL!);
-        app.listen(process.env.PORT, (error) => {
-            if (error) {
-                console.error(error);
-                return;
-            }
-            console.log("listening on port : ", process.env.PORT);
-
+        const port = parseInt(process.env.PORT || "3000", 10);
+        const server = app.listen(port, () => {
+            console.log("listening on port : ", port);
+        });
+        server.on("error", (error: any) => {
+            console.error(error);
         });
     } catch (e) {
         console.error("error launching app:",e)

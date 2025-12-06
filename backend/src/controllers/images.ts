@@ -9,7 +9,9 @@ export const uploadImg: RequestHandler = async (req,res)=>{
         console.log("req file: ", req.file)
         console.log("user_id: ", req["user_id"])
         const userId = req['user_id'];
-        const updateRes = await User.updateOne({ _id: userId }, { $set: { imgUrl: req.file.path } })
+        const updateRes = await User.updateOne({ _id: userId }, { $set: { 
+            mobileAppImgUrl: `${process.env.MOBILE_APP_URL}/uploads/${req.file.filename}`,
+            imgUrl: `${process.env.BASE_URL}/uploads/${req.file.filename}` } })
         console.log("update imgUrl result :", updateRes)
 
         return res.status(200).send("success");
@@ -18,4 +20,4 @@ export const uploadImg: RequestHandler = async (req,res)=>{
         return res.status(500).send("failed to upload image");
 
     }
-}
+} 

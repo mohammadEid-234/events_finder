@@ -50,7 +50,8 @@ export const createUser: RequestHandler = async (req, res, next) => {
             email: params.email,
             phoneNumber: validPhoneNumber,
             fullName: params.full_name,
-            password: passwordHashed
+            password: passwordHashed,
+            imgUrl:`${process.env.BASE_URL}/uploads/default_profile.png`
         })
         const refreshToken = signRefreshToken({ "user_id": user.id })
         const accessToken = signAccessToken({ "user_id": user.id })

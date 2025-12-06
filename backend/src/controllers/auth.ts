@@ -1,5 +1,7 @@
-import type { RequestHandler,CookieOptions } from "express";
-import { signAccessToken, verifyToken } from "../lib/jwt.ts";
+import type { RequestHandler, CookieOptions } from "express";
+import { accessTokenSignOptions, refreshTokenSignOptions, signAccessToken, verifyToken } from "../lib/jwt.ts";
+import jwt from "jsonwebtoken";
+import { v4 as uui } from "uuid";
 export const globalCookieOptions: CookieOptions = {
     httpOnly: true,        // not accessible via JS
     secure: true,          // only sent over HTTPS
@@ -17,27 +19,40 @@ export const accessTokenOptions: CookieOptions = {
 export const verifyUser: RequestHandler = (req, res, next) => {
 
     try {
-        const token = verifyToken(req.headers["access_token"] || req.cookies["access_token"])
+        const bearerToken = req.headers["authorization"].split(" ")[1];
+        const token = verifyToken(bearerToken || req.cookies["access_token"])
 
         req["user_id"] = token["user_id"];
         next()
     } catch (e) {
         console.error("error verifying token:", e)
-        return res.status(401).send({"message":"Expired or Invalid token"});
+        return res.status(401).send({ "message": "Expired or Invalid token" });
     }
 
 }
 
-export const getAccessToken:RequestHandler = async (req,res)=>{
-        console.log("request cookies", req.cookies)
+export const getAccessToken: RequestHandler = async (req, res) => {
+
     const sentToken = req.header("refresh_token") || req.cookies["refresh_token"];
-    console.log("sentRefreshToken:", sentToken);
     try {
         const verifiedRefreshToken = verifyToken(sentToken)
-        const newAccessToken = signAccessToken({ "user_id": verifiedRefreshToken["user_id"] })
+        console.log("verified refresh token:", verifiedRefreshToken);
+        const oldExp = verifiedRefreshToken["exp"]; // absolute timestamp from old token
+        const nowInSeconds = Math.floor(Date.now() / 1000);
+        const remainingSeconds = oldExp - nowInSeconds; // avoid extending expiry on refresh
+        console.log("remaining seconds for refresh token:", remainingSeconds);
+        if (remainingSeconds <= 0) {
+            return res.status(401).send({ "message": "Expired refresh token" });
+        }
+        const newAccessToken = signAccessToken({ "user_id": verifiedRefreshToken["user_id"], })
+        const newRefreshToken = jwt.sign({ "user_id": verifiedRefreshToken["user_id"],/*unique Id for each token*/"uuid": uui() }, process.env.JWT_SECRET ?? "", {
+             ...refreshTokenSignOptions,
+            expiresIn: remainingSeconds // set refresh token expiry same as old one
+        });
         res.cookie("access_token", newAccessToken, accessTokenOptions)
-        res.cookie("refresh_token", verifiedRefreshToken, refreshTokenOptions);
+        res.cookie("refresh_token", newRefreshToken, refreshTokenOptions);
         return res.status(200).send({
+            "refresh_token": newRefreshToken,
             "access_token": newAccessToken
         });
     } catch (e) {

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:finder/core/connection/dio.dart';
 import 'package:finder/core/connection/token.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -13,11 +14,8 @@ class AuthInterceptor extends QueuedInterceptor {
     required this.dio,
     this.shouldClearBeforeReset = true,
   }) {
-    refreshClient = Dio();
-    refreshClient.options = BaseOptions(baseUrl: dio.options.baseUrl);
-
-    retryClient = Dio();
-    retryClient.options = BaseOptions(baseUrl: dio.options.baseUrl);
+    refreshClient = Dio(globalDioOptions);
+    retryClient = Dio(globalDioOptions);
   }
 
   final Dio dio;
@@ -30,7 +28,7 @@ class AuthInterceptor extends QueuedInterceptor {
   Future<Map<String, dynamic>> _buildHeaders() async {
     final tokenPair = await tokenManager.getTokenPair();
 
-    return {'Authorization': 'Bearer ${tokenPair!.accessToken}'};
+    return {'authorization': 'Bearer ${tokenPair!.accessToken}'};
   }
 
   /// Check if the token pair should be refreshed
@@ -46,17 +44,17 @@ class AuthInterceptor extends QueuedInterceptor {
 
     try {
       refreshClient.options = refreshClient.options.copyWith(
-        headers: {'refresh-token': tokenPair.refreshToken},
+        headers: {'refresh_token': tokenPair.refreshToken},
       );
 
       /// it will be changed based on your project
       final response = await refreshClient.get(
-        '/auth/refresh-token',
+        '/auth/new-access-token',
       );
 
       final TokenPair newTokenPair = (
-        accessToken: response.data['accessToken'],
-        refreshToken: response.data['refreshToken'],
+        accessToken: response.data['access_token'],
+        refreshToken: response.data['refresh_token'],
       );
 
       if (shouldClearBeforeReset) {
@@ -129,7 +127,8 @@ class AuthInterceptor extends QueuedInterceptor {
               true,
             );
           }
-
+          // overwrite the old token pair
+          tokenManager.saveTokenPair(newTokenPair);
           options.headers.addAll(await _buildHeaders());
           return handler.next(options);
         }
